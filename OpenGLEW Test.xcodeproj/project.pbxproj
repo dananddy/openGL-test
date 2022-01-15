@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		032AE4DC2791C8A700DC2474 /* ShaderManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 032AE4DA2791C8A700DC2474 /* ShaderManager.cpp */; };
+		032AE6902792F6E100DC2474 /* Helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 032AE68E2792F6E100DC2474 /* Helper.cpp */; };
 		0382AF34278DB6AB004C6C0B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382AF33278DB6AB004C6C0B /* main.cpp */; };
 		0382AF3C278DB7CE004C6C0B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0382AF3B278DB7CD004C6C0B /* OpenGL.framework */; };
 		0382AF3E278DC090004C6C0B /* libGLEW.2.2.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0382AF3D278DC090004C6C0B /* libGLEW.2.2.0.dylib */; };
 		0382AF40278DC0B5004C6C0B /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0382AF3F278DC0B5004C6C0B /* libglfw.3.3.dylib */; };
-		0382AF45278DE757004C6C0B /* ShaderUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382AF43278DE757004C6C0B /* ShaderUtil.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,14 +29,18 @@
 
 /* Begin PBXFileReference section */
 		031923D0278F6E5200BB255D /* shaders */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = shaders; sourceTree = SOURCE_ROOT; };
+		032AE4DA2791C8A700DC2474 /* ShaderManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderManager.cpp; sourceTree = "<group>"; };
+		032AE4DB2791C8A700DC2474 /* ShaderManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ShaderManager.hpp; sourceTree = "<group>"; };
+		032AE4DD2791CC4100DC2474 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
+		032AE68D2792231D00DC2474 /* glm */ = {isa = PBXFileReference; lastKnownFileType = folder; path = glm; sourceTree = "<group>"; };
+		032AE68E2792F6E100DC2474 /* Helper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Helper.cpp; sourceTree = "<group>"; };
+		032AE68F2792F6E100DC2474 /* Helper.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Helper.hpp; sourceTree = "<group>"; };
 		0382AF30278DB6AB004C6C0B /* OpenGLEW Test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "OpenGLEW Test"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0382AF33278DB6AB004C6C0B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		0382AF3B278DB7CD004C6C0B /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		0382AF3D278DC090004C6C0B /* libGLEW.2.2.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.2.0.dylib; path = ../../../../usr/local/Cellar/glew/2.2.0_1/lib/libGLEW.2.2.0.dylib; sourceTree = "<group>"; };
 		0382AF3F278DC0B5004C6C0B /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../usr/local/Cellar/glfw/3.3.6/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		0382AF41278DC1D8004C6C0B /* OpenGLEW Test.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "OpenGLEW Test.entitlements"; sourceTree = "<group>"; };
-		0382AF43278DE757004C6C0B /* ShaderUtil.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderUtil.cpp; sourceTree = "<group>"; };
-		0382AF44278DE757004C6C0B /* ShaderUtil.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ShaderUtil.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +57,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		032AE4D72791BABC00DC2474 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				032AE68D2792231D00DC2474 /* glm */,
+				032AE4DD2791CC4100DC2474 /* stb_image.h */,
+				032AE68E2792F6E100DC2474 /* Helper.cpp */,
+				032AE68F2792F6E100DC2474 /* Helper.hpp */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
 		0382AF27278DB6AB004C6C0B = {
 			isa = PBXGroup;
 			children = (
@@ -72,6 +88,7 @@
 		0382AF32278DB6AB004C6C0B /* OpenGLEW Test */ = {
 			isa = PBXGroup;
 			children = (
+				032AE4D72791BABC00DC2474 /* Helpers */,
 				031923D0278F6E5200BB255D /* shaders */,
 				0382AF42278DE739004C6C0B /* source */,
 				0382AF41278DC1D8004C6C0B /* OpenGLEW Test.entitlements */,
@@ -93,8 +110,8 @@
 		0382AF42278DE739004C6C0B /* source */ = {
 			isa = PBXGroup;
 			children = (
-				0382AF43278DE757004C6C0B /* ShaderUtil.cpp */,
-				0382AF44278DE757004C6C0B /* ShaderUtil.hpp */,
+				032AE4DA2791C8A700DC2474 /* ShaderManager.cpp */,
+				032AE4DB2791C8A700DC2474 /* ShaderManager.hpp */,
 			);
 			path = source;
 			sourceTree = "<group>";
@@ -142,6 +159,8 @@
 				Base,
 			);
 			mainGroup = 0382AF27278DB6AB004C6C0B;
+			packageReferences = (
+			);
 			productRefGroup = 0382AF31278DB6AB004C6C0B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -156,8 +175,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0382AF45278DE757004C6C0B /* ShaderUtil.cpp in Sources */,
+				032AE4DC2791C8A700DC2474 /* ShaderManager.cpp in Sources */,
 				0382AF34278DB6AB004C6C0B /* main.cpp in Sources */,
+				032AE6902792F6E100DC2474 /* Helper.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

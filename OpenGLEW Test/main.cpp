@@ -4,45 +4,13 @@
 //
 //  Created by Bohdan Andriychuk on 11.01.2022.
 //
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
+#define STB_IMAGE_IMPLEMENTATION
 
-#include "ShaderUtil.hpp"
-
-
-struct ShaderProgramSource
-{
-    std::string VertexSource;
-    std::string FragmentSource;
-};
+#include "Helpers/Helper.hpp"
+#include "source/ShaderManager.hpp"
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-
-static unsigned int CompileShader( unsigned int type, const std::string& source);
-
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader);
-
-static ShaderProgramSource ParseShaderFiles(const std::string VSfilePath, const std::string FSfilePath);
-
-const char* vertexShader = "#version 330 core\n"
-"layout (location = 0) in vec4 position;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = position;\n"
-"}\0";
-const char* fragmentShader = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.0, 0.0, 0.5f);\n"
-"}\n\0";
 
 int main(void)
 {
@@ -62,9 +30,10 @@ int main(void)
 #endif
     
     
-    unsigned int width = 800;
-    unsigned int height = 600;
-    window = glfwCreateWindow(width, height, "test creen 1", NULL, NULL);
+    unsigned int WIDTH = 800;
+    unsigned int HEIGHT = 600;
+
+    window = glfwCreateWindow(WIDTH, HEIGHT, "test creen 1", NULL, NULL);
     
     if (!window) {
         std::cout << " can't create window!!!" << std::endl;
@@ -77,6 +46,7 @@ int main(void)
     std::cout << "oepngl shader version: " << major << "." << minor << std::endl;
     
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
     glfwSetKeyCallback(window, key_callback);
     
     if (glewInit() != GLEW_OK) {
@@ -85,15 +55,16 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
     
     float vertices[] = {
-        -0.5f, -0.5f,
-        0.5f,  -0.5f,
-        0.5f, 0.5f,
-        -0.5f, 0.5f
+        // positions          // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
     };
     
     unsigned int indices[] = {
-        0,1,2,
-        2,3,0
+        0,1,3,
+        1,2,3
     };
     
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
@@ -110,8 +81,62 @@ int main(void)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    
+    unsigned int texture1, texture2;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    // load and generate the texture
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *data = stbi_load("/Users/b.andriychuk/Desktop/test.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+    
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);    // set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    data = stbi_load("/Users/b.andriychuk/Desktop/png-test.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        GLCallV(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+    
+    
+    
+    
+    float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
     
@@ -119,22 +144,44 @@ int main(void)
     
     
 
-    ShaderProgramSource source = ParseShaderFiles("/Users/b.andriychuk/Projects/OpenGLEW Test/shaders/basicVS.shader", "/Users/b.andriychuk/Projects/OpenGLEW Test/shaders/basicFS.shader");
-    std::cout<< "FILE: " << source.FragmentSource << "\n ____ \n" << source.VertexSource << std::endl;
+    Shader shader;
+    shader.CreateShader("/Users/b.andriychuk/Projects/OpenGLEW Test/shaders/basicVS.shader", "/Users/b.andriychuk/Projects/OpenGLEW Test/shaders/basicFS.shader");
     
+    GLCallV(shader.use());
 
-    unsigned int shader = CreateShader(source.VertexSource, source.FragmentSource);
-    glUseProgram(shader);
-    
-    // Uncommenting this call will result in wireframe polygons.
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    
+    shader.setInt("texture1", 0);
+    shader.setInt("texture2", 1);
+
+    GLCallV(glUseProgram(0));
+    GLCallV(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GLCallV(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+//
+
+
     while (!glfwWindowShouldClose(window)) {
+        glClearColor(0.3f, 0.5f, 0.2, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        GLCallV(shader.use());
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glfwSwapBuffers(window);
         
+        glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1); // activate the texture unit first before binding texture
+        glBindTexture(GL_TEXTURE_2D, texture2);
+
+        // create transformations
+        glm::mat4 transform = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        transform = glm::translate(transform, glm::vec3(0.5f * sin((float)glfwGetTime()), -0.5f * sin((float)glfwGetTime()), 0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        // get matrix's uniform location and set matrix
+        unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
+        
+        GLCallV(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+        
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
     
@@ -142,7 +189,6 @@ int main(void)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    glDeleteProgram(shader);
     
     glfwTerminate();
     
@@ -154,68 +200,4 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
-}
-
-static unsigned int CompileShader( unsigned int type, const std::string& source)
-{
-    unsigned int id = glCreateShader(type);
-    const char* src = source.c_str();
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
-    
-    int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-    if (result == GL_FALSE)
-    {
-        int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-        char* mesaege = (char*) alloca(length * sizeof(char));
-        glGetShaderInfoLog(id, length, &length, mesaege);
-        
-        std::cout << "Failed to copile "<< (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
-        std::cout << mesaege << std::endl;
-        
-        glDeleteShader(id);
-        return 0;
-    }
-    
-    return id;
-}
-
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
-{
-    unsigned int program = glCreateProgram();
-    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-    
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
-    
-    glDeleteShader(vs);
-    glDeleteShader(fs);
-    
-    return program;
-}
-
-static ShaderProgramSource ParseShaderFiles(const std::string VSfilePath, const std::string FSfilePath) {
-    std::ifstream VSfile(VSfilePath);
-    std::string str_vs;
-    std::string VScontent;
-    while (std::getline(VSfile, str_vs)) {
-        VScontent.append(str_vs + "\n");
-    }
-    
-    std::ifstream FSfile(FSfilePath);
-    std::string str_fs;
-    std::string FScontent;
-    while (std::getline(FSfile, str_fs)) {
-        FScontent.append(str_fs + "\n");
-    }
-    
-    return
-    {
-        VScontent, FScontent
-    };
 }
